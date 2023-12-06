@@ -6,7 +6,7 @@ ENV SDK_HOME /opt
 WORKDIR $SDK_HOME
 
 RUN apt-get --quiet update --yes
-RUN apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1 git file build-essential --no-install-recommends
+RUN apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1 git file build-essential cmake --no-install-recommends
 
 # Gradle
 ENV GRADLE_VERSION 3.3
@@ -29,11 +29,12 @@ RUN mkdir ${ANDROID_HOME} && wget --quiet --output-document=android-sdk.zip http
 
 ENV PATH ${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:$PATH
 
-# Android Cmake
-RUN wget -q https://dl.google.com/android/repository/cmake-3.6.3155560-linux-x86_64.zip -O android-cmake.zip
-RUN unzip -q android-cmake.zip -d ${ANDROID_HOME}/cmake
-ENV PATH ${PATH}:${ANDROID_HOME}/cmake/bin
-RUN chmod u+x ${ANDROID_HOME}/cmake/bin/ -R
+# # Android Cmake
+# RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.25.1/cmake-3.25.1-linux-x86_64.tar.gz -O android-cmake.tgz
+# RUN mkdir -p ${ANDROID_HOME}/cmake
+# RUN tar zxf android-cmake.tgz -C ${ANDROID_HOME}/cmake
+# ENV PATH ${PATH}:${ANDROID_HOME}/cmake/bin
+# RUN chmod u+x ${ANDROID_HOME}/cmake/bin/ -R
 
 RUN echo y | android-sdk-linux/tools/android --silent update sdk --no-ui --all --filter "${ANDROID_TARGET_SDK}" && \
     echo y | android-sdk-linux/tools/android --silent update sdk --no-ui --all --filter platform-tools && \
@@ -56,3 +57,9 @@ RUN chmod u+x ${ANDROID_NDK_HOME}/ -R
 
 RUN mkdir ${ANDROID_HOME}/licenses && echo "8933bad161af4178b1185d1a37fbf41ea5269c55" >> ${ANDROID_HOME}/licenses/android-sdk-license
 
+RUN cd /tmp \
+    && wget -nc http://192.168.2.2/qt-everywhere-src-6.4.1.tar.xz \
+    || wget -nc https://download.qt.io/official_releases/qt/6.4/6.4.1/single/qt-everywhere-src-6.4.1.tar.xz \
+    && tar Jxf qt-everywhere-src-6.4.1.tar.xz \
+    && rm qt-everywhere-src-6.4.1.tar.xz \
+    && cd qt-everywhere-src-6.4.1
